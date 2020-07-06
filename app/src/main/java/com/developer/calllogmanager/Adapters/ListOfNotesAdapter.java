@@ -1,12 +1,16 @@
 package com.developer.calllogmanager.Adapters;
 
+import android.content.ContentUris;
 import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 import android.databinding.DataBindingUtil;
 import android.databinding.adapters.DatePickerBindingAdapter;
+import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,9 +18,11 @@ import android.widget.CursorAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.developer.calllogmanager.EditNoteActivity;
 import com.developer.calllogmanager.ListOfNotes;
 import com.developer.calllogmanager.Models.SugarModel;
 import com.developer.calllogmanager.R;
+import com.developer.calllogmanager.UpdateNote;
 import com.developer.calllogmanager.databinding.RowListOfNotesRecyclerViewBinding;
 import com.developer.calllogmanager.dbHelper.DatabaseHelper;
 
@@ -33,12 +39,13 @@ public class ListOfNotesAdapter extends RecyclerView.Adapter<ListOfNotesAdapter.
     int listIndex = 0;
     Cursor cursor ;
 
+    DatabaseHelper databaseHelper ;
+
     public ListOfNotesAdapter(String Date, Context context ) {
         this.context = context;
         listOfNotesRecieved = new ArrayList<>();
 
-        DatabaseHelper databaseHelper = new DatabaseHelper(context);
-
+        databaseHelper = new DatabaseHelper(context);
 
         cursor = databaseHelper.GETNOTES(Date);
         SugarModel model = new SugarModel();
@@ -48,19 +55,7 @@ public class ListOfNotesAdapter extends RecyclerView.Adapter<ListOfNotesAdapter.
             while (!cursor.isAfterLast()) {
                 String DateRecieved = String.valueOf(cursor.getString(cursor.getColumnIndex("DATE")));
                 String Note = String.valueOf(cursor.getString(cursor.getColumnIndex("NOTE")));
-                model.setUid(String.valueOf(cursor.getString(cursor.getColumnIndex("ID"))));
-                model.setDate(DateRecieved);
-                model.setNote(Note);
-                model.setExtra(String.valueOf(cursor.getString(cursor.getColumnIndex("EXTRA"))));
-                model.setNumber(String.valueOf(cursor.getString(cursor.getColumnIndex("NUMBER"))));
-                model.setCurrentDate(String.valueOf(cursor.getString(cursor.getColumnIndex("CURRENTDATE"))));
-                model.setHours(Integer.parseInt(String.valueOf(cursor.getString(cursor.getColumnIndex("HOURS")))));
-                model.setMinutes(Integer.parseInt(String.valueOf(cursor.getString(cursor.getColumnIndex("MINUTES")))));
-                model.setDayOfMonth(Integer.parseInt(String.valueOf(cursor.getString(cursor.getColumnIndex("DAY_OF_MONTH")))));
-                model.setMonth(Integer.parseInt(String.valueOf(cursor.getString(cursor.getColumnIndex("MONTH")))));
-                model.setYear(Integer.parseInt(String.valueOf(cursor.getString(cursor.getColumnIndex("YEAR")))));
                 cursor.moveToNext();
-                records.add(model);
             }
         }
         else
@@ -83,24 +78,38 @@ public class ListOfNotesAdapter extends RecyclerView.Adapter<ListOfNotesAdapter.
     public void onBindViewHolder(@NonNull ListOfNotesViewHolder holder, final int position) {
         // TODO notesModel is presenting the same data at the view find out why and resolve it when you are back to work
 
-        if(cursor.moveToFirst()){
-            if(!cursor.isAfterLast()){
-                if(cursor.moveToNext()) {
-                    itemBinding.textViewNameId.setText(String.valueOf(cursor.getString(cursor.getColumnIndex("NOTE"))));
-                    itemBinding.textViewStatus.setText(String.valueOf(cursor.getString(cursor.getColumnIndex("DATE"))));
-                    int pos = cursor.getPosition();
-                    int columnCount = cursor.getColumnCount();
-                    cursor.move(listIndex);
-                    /* TODO The cursor is not moving to the next position so the list of notes being initiazed by the same object in each row ...
-                    *   Find out the way to fix this
-                    *   And then edit a specific note
-                    *   Delete the specific note
-                    *   Add reminder to each activity       */
-                    listIndex++;
-                }
+        Log.d("BindView Position : ", String.valueOf(position));
+        
+        if(cursor.moveToFirst()) {
+            if (!cursor.isAfterLast()) {
+                SugarModel model = new SugarModel();
+                cursor.move(listIndex);
+                String DateRecieved = String.valueOf(cursor.getString(cursor.getColumnIndex("DATE")));
+                String Note = String.valueOf(cursor.getString(cursor.getColumnIndex("NOTE")));
+                String id = String.valueOf(cursor.getString(cursor.getColumnIndex("ID")));
+                Date dateObject = new Date(Long.parseLong(DateRecieved));
+                SimpleDateFormat formatter = new SimpleDateFormat("dd-MMM-yyyy hh:mm a");
+                int pos = cursor.getPosition();
+                itemBinding.textViewNameId.setText(Note);
+                itemBinding.textViewStatus.setText(formatter.format(dateObject));
+                model.setNote(Note);
+                model.setDate(DateRecieved);
+                model.setUid(id);
+                model.setCurrentDate(String.valueOf(cursor.getString(cursor.getColumnIndex("CURRENTDATE"))));
+                model.setHours(Integer.parseInt(String.valueOf(cursor.getString(cursor.getColumnIndex("HOURS")))));
+                model.setMinutes(Integer.parseInt(String.valueOf(cursor.getString(cursor.getColumnIndex("MINUTES")))));
+                model.setDayOfMonth(Integer.parseInt(String.valueOf(cursor.getString(cursor.getColumnIndex("DAY_OF_MONTH")))));
+                model.setMonth(Integer.parseInt(String.valueOf(cursor.getString(cursor.getColumnIndex("MONTH")))));
+                model.setYear(Integer.parseInt(String.valueOf(cursor.getString(cursor.getColumnIndex("YEAR")))));
+                records.add(model);
+                // TODO The cursor is not moving to the next position so the list of notes being initiazed by the same object in each row [FIXED NOW]
+                 // TODO *   And then edit a specific note [DONE]
+                 // TODO *   Delete the specific note
+                // TODO *   Add reminder to each activitY
+                listIndex++;
+                cursor.moveToNext();
             }
         }
-
 
         /*String note = records.get(listIndex).getNote();
         final String date = records.get(listIndex).getDate();
@@ -110,21 +119,24 @@ public class ListOfNotesAdapter extends RecyclerView.Adapter<ListOfNotesAdapter.
         itemBinding.editNoteImageViewId.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                DatabaseHelper dbHelper = new DatabaseHelper(context);
-                ArrayList<SugarModel> arrayList = new ArrayList<SugarModel>();
-                arrayList = dbHelper.FetchData();
-                String strin = arrayList.get(position).getNote();
-                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("DD:MM:YYY HH:MM a");
-//                Date formatDate = new Date(Long.valueOf(date));
-
-
-                String currentDate =  records.get(position).getCurrentDate();
+/*                String currentDate =  records.get(position).getCurrentDate();
                 String note =  records.get(position).getNote();
+                int hours = records.get(position).getHours();*/
                 String Id = records.get(position).getUid();
-                int hours = records.get(position).getHours();
 
-                Toast.makeText(context, "ID : " + Id , Toast.LENGTH_SHORT).show();
-//                Toast.makeText(context, simpleDateFormat.format(String.valueOf(formatDate)) , Toast.LENGTH_SHORT).show();
+//                Toast.makeText(context, "ID : " + Id , Toast.LENGTH_SHORT).show();
+
+                SugarModel specificNote = databaseHelper.GetSpecificNote(Id);
+                Intent toUpdateNote = new Intent(context , UpdateNote.class);
+                Bundle noteBundle = new Bundle();
+                noteBundle.putSerializable("NoteToEdit" , specificNote);
+                toUpdateNote.putExtra("NoteBundle" , noteBundle);
+                context.startActivity(toUpdateNote);
+                Toast.makeText(context, specificNote.getNote(), Toast.LENGTH_SHORT).show();
+
+
+
+
             }
         });
         itemBinding.deleteNoteImageViewId.setOnClickListener(new View.OnClickListener() {
@@ -139,7 +151,7 @@ public class ListOfNotesAdapter extends RecyclerView.Adapter<ListOfNotesAdapter.
 
     @Override
     public int getItemCount() {
-        return records.size();
+        return cursor.getCount();
     }
 
     public class ListOfNotesViewHolder extends RecyclerView.ViewHolder {

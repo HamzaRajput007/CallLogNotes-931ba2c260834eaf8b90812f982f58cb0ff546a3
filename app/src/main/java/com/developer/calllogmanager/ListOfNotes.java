@@ -98,13 +98,13 @@ public class ListOfNotes extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         Date = getIntent().getStringExtra("DATE");
         Log.d("DATE_VALUE", Date);
-       /* databaseHelper = new DatabaseHelper(getBaseContext());
+        databaseHelper = new DatabaseHelper(getBaseContext());
         ArrayList<SugarModel> records = new ArrayList<>();
         SugarModel model = new SugarModel();
 
-        Cursor cursor = databaseHelper.GETNOTE(Date);
+        Cursor cursor = databaseHelper.GETNOTES(Date);
 
-        if(cursor.moveToFirst()){
+       /* if(cursor.moveToFirst()){
             while (!cursor.isAfterLast()) {
 
                 String DateRecieved = String.valueOf(cursor.getString(cursor.getColumnIndex("DATE")));

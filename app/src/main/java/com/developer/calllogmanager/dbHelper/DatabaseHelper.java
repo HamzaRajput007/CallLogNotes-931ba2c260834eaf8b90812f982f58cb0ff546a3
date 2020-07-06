@@ -251,9 +251,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         String[] selectionArgs = {date};
         sqLiteDatabase = this.getReadableDatabase();
         Cursor cursor = sqLiteDatabase.query(TABLE_NAME, columns, selection, selectionArgs, null, null, null);
-//        sqLiteDatabase.close();
         int length = cursor.getCount();
-
         if(cursor.moveToFirst()){
             while (!cursor.isAfterLast()) {
                 String Date = String.valueOf(cursor.getString(cursor.getColumnIndex("DATE")));
@@ -261,13 +259,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 cursor.moveToNext();
             }
         }
+        sqLiteDatabase.close();
         return cursor;
     }
 
-    public SugarModel GetSpecificNote(String currentDate){
+    public SugarModel GetSpecificNote(String id ){
         String[] columns = {COL_2 , COL_3 , COL_4 , COL_5 , COL_6 , HOURS , MINUTES , DAY_OF_MONTH , MONTH , YEAR};
-        String selection = COL_6 + " = ?";
-        String[] selectionArgs = {currentDate};
+        String selection = COL_1 + " = ?";
+        String[] selectionArgs = {id};
         sqLiteDatabase = this.getReadableDatabase();
         Cursor cursor = sqLiteDatabase.query(TABLE_NAME, columns, selection, selectionArgs, null, null, null);
 //        sqLiteDatabase.close();
@@ -279,38 +278,75 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         if(cursor.moveToFirst()){
             while (!cursor.isAfterLast()) {
-
                 String Date = String.valueOf(cursor.getString(cursor.getColumnIndex("DATE")));
                 String Note = String.valueOf(cursor.getString(cursor.getColumnIndex("NOTE")));
                 String NUMBER = String.valueOf(cursor.getString(cursor.getColumnIndex("NUMBER")));
                 String EXTRA = String.valueOf(cursor.getString(cursor.getColumnIndex("EXTRA")));
                 String CURRENT_TIME = String.valueOf(cursor.getString(cursor.getColumnIndex("CURRENTDATE")));
-                String ampm = String.valueOf(cursor.getString(cursor.getColumnIndex("AMPM")));
+//                String ampm = String.valueOf(cursor.getString(cursor.getColumnIndex("AMPM")));
                 int Hours = cursor.getInt(cursor.getColumnIndex("HOURS")) ;
                 int Minutes = cursor.getInt(cursor.getColumnIndex("MINUTES")) ;
                 int day_of_month = cursor.getInt(cursor.getColumnIndex("DAY_OF_MONTH")) ;
                 int month = cursor.getInt(cursor.getColumnIndex("MONTH")) ;
                 int year = cursor.getInt(cursor.getColumnIndex("YEAR")) ;
-                long id = cursor.getLong(cursor.getColumnIndex("ID")) ;
+//                long noteId = cursor.getLong(cursor.getColumnIndex("ID")) ;
 
                 specificNote.setDate(Date);
                 specificNote.setNote(Note);
                 specificNote.setNumber(NUMBER);
                 specificNote.setExtra(EXTRA);
                 specificNote.setCurrentDate(CURRENT_TIME);
-                specificNote.setAmpm(ampm);
+//                specificNote.setAmpm(ampm);
                 specificNote.setHours(Hours);
                 specificNote.setMinutes(Minutes);
                 specificNote.setDayOfMonth(day_of_month);
                 specificNote.setMonth(month);
                 specificNote.setYear(year);
-                specificNote.setId(id);
+//                specificNote.setId(noteId);
 
 
                 cursor.moveToNext();
             }
         }
         return specificNote;
+    }
+
+    public boolean updateNote( String note_id ,SugarModel model){
+      /*  sqLiteDatabase = this.getWritableDatabase();
+        ContentValues cv = new ContentValues();
+        cv.put(COL_2_STATUS_DATE,date);
+        cv.put(COL_3_STATUS_VALUE,value);
+
+        long ins = sqLiteDatabase.update(TABLE_STATUS, cv,"StatusDate="+date,null);
+        if (ins == -1) {
+            return false;
+        } else
+            return true;*/
+
+      sqLiteDatabase = this.getReadableDatabase();
+      ContentValues cv = new ContentValues();
+        cv.put(COL_2,model.getDate());
+        cv.put(COL_3, model.getNote());
+        cv.put(COL_4, model.getExtra());
+        cv.put(COL_5, model.getNumber());
+        cv.put(COL_6, model.getCurrentDate());
+        cv.put(HOURS , model.getHours());
+        cv.put(MINUTES , model.getMinutes());
+        cv.put(DAY_OF_MONTH , model.getDayOfMonth());
+        cv.put(MONTH , model.getMonth());
+        cv.put(YEAR , model.getYear());
+
+        String whereClause = COL_6 + " = ?";
+//        String noteId = model.getUid();
+        String[] selectionArgs = {note_id};
+
+        long isUpdated = sqLiteDatabase.update(TABLE_NAME , cv , whereClause , selectionArgs  );
+        if(isUpdated == -1){
+            return false;
+        }
+        else{
+            return true ;
+        }
     }
 
     public  Cursor GetReminders(){

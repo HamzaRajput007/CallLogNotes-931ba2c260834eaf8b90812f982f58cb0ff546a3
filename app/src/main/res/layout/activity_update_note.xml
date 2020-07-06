@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:orientation="vertical"
+    android:layout_height="match_parent"
+    tools:context=".UpdateNote">
+
+    <!--<LinearLayout
+        android:orientation="horizontal"
+        android:weightSum="3"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize">
+        <Spinner
+            android:id="@+id/spinnerUpdateNote"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="3"
+            android:drawableTint="@color/colorPrimary"
+            android:foregroundTint="@color/colorPrimaryDark"
+            android:layout_margin="10dp"
+            android:textColorHint="#000"
+            android:textColor="#000000"
+            android:backgroundTint="@color/colorPrimaryDark"
+            android:hint="Select Status" />
+        <Button
+            android:visibility="gone"
+            android:id="@+id/btnSaveStatus"
+            android:text="Save Status"
+            android:background="@drawable/btn_background"
+            android:layout_width="0dp"
+            android:layout_weight=".8"
+            android:textColor="#fff"
+            android:textSize="8dp"
+            android:padding="5dp"
+            android:layout_margin="10dp"
+            android:layout_height="match_parent"/>
+
+    </LinearLayout>-->
+
+
+    <EditText
+        android:id="@+id/editTextUpdateNote"
+        android:background="@drawable/edittex_background"
+        android:padding="10dp"
+        android:layout_marginTop="100dp"
+        android:textColor="#000"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:layout_marginBottom="10dp"
+        android:gravity="start"
+        android:hint="Enter Your Note Here"
+        android:layout_width="match_parent"
+        android:layout_height="200dp"/>
+
+
+    <Button
+        android:id="@+id/btnUpdateNote"
+        android:text="UPDATE"
+        android:background="@drawable/btn_background"
+        android:layout_width="150dp"
+        android:textColor="#fff"
+        android:layout_gravity="center"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="30dp"
+        android:layout_height="wrap_content"/>
+
+
+
+</LinearLayout>

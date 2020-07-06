@@ -102,7 +102,7 @@ public class EditNoteActivity extends AppCompatActivity {
         spin.setAdapter(adapter);
 
 //        getStatusData(adapter);
-        //saveStatusValue();
+        saveStatusValue();
 
         SharedPreferences pref= PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         String recfilename= pref.getString("filename","");
@@ -147,7 +147,7 @@ public class EditNoteActivity extends AppCompatActivity {
                     Snackbar.make(findViewById(android.R.id.content), "Please select Status or write some Note.", Snackbar.LENGTH_LONG).show();
                 }else {
                     saveTextNote();
-//                    saveStatus();
+                    saveStatus();
                     final AlertDialog.Builder alertBuilder = new AlertDialog.Builder(EditNoteActivity.this);
                     alertBuilder.setTitle("Do you wish to add a calendar event for this call?");
                     alertBuilder.setMessage("This will notify you about the note");
@@ -219,25 +219,16 @@ public class EditNoteActivity extends AppCompatActivity {
         speak();
     }
 
-    /*private void saveStatus() {
+    private void saveStatus() {
 
         if(spin.getSelectedItem().toString().equals("Select Status")){
          return;
         }
-            *//*if(chek_status_value.equals("Insert")){
-                boolean f=  helper.SaveStatus(CallDate, spin.getSelectedItem().toString());
-              *//**//*  if(f)
-                    Snackbar.make(findViewById(android.R.id.content), "Status Saved", Snackbar.LENGTH_LONG).show();
-              *//**//*  return;
-            }
-            if(chek_status_value.equals("Update")) {
-                boolean g=helper.update_status(CallDate,spin.getSelectedItem().toString());
-               *//**//* if(g){
-                    Snackbar.make(findViewById(android.R.id.content), "Update Saved", Snackbar.LENGTH_LONG).show();
-                }*//**//*
-                return;
-            }*//*
-    }*/
+        boolean f=  helper.SaveStatus(CallDate, spin.getSelectedItem().toString());
+        if(f)
+            Snackbar.make(findViewById(android.R.id.content), "Status Saved", Snackbar.LENGTH_LONG).show();
+        return;
+    }
 
     private void saveTextNote() {
         String text = editTextNote.getText().toString();
@@ -284,7 +275,7 @@ public class EditNoteActivity extends AppCompatActivity {
         }
     }
     private void getStatusData(ArrayAdapter<String> adapter) {
-        /*String a=helper.getStatus(CallDate);
+        String a=helper.getStatus(CallDate);
 
         if (a.length()>2){
             chek_status_value="Update";
@@ -295,7 +286,7 @@ public class EditNoteActivity extends AppCompatActivity {
         }
         else {
             chek_status_value="Insert";
-        }*/
+        }
 
     }
 
